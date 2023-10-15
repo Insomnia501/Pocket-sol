@@ -1,16 +1,23 @@
+//Contract based on [https://docs.openzeppelin.com/contracts/3.x/erc721](https://docs.openzeppelin.com/contracts/3.x/erc721)
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ERC6551Registry.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract ERC6551NFT is ERC721, Ownable {
+
+// Pocket合约 ERC721标准
+
+contract Pocket is ERC721URIStorage, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
     ERC6551Registry public registry;
     address public erc6551AccountImplementation;
-    uint256 tokenId;
 
-    event AccountCreated(uint256 tokenId);
+    event AccountCreated(uint256 tokenId, address newAccount);
 
     constructor(
         string memory name,
@@ -20,32 +27,29 @@ contract ERC6551NFT is ERC721, Ownable {
     ) ERC721(name, symbol) {
         registry = ERC6551Registry(_registryAddress);
         erc6551AccountImplementation = _erc6551AccountImplementation;
-        tokenId = 0;
     }
 
-    function mintWithAccount(address to) public {
-        uint256 newTokenId = getTokenId() + 1;// ERC721没有totalSupply，奇怪，先这么弄着
-        _mint(to, newTokenId);
+    function mintPocket(address recipient, string memory tokenURI)
+        public onlyOwner
+    {
+        _tokenIds.increment();
+
+        uint256 newItemId = _tokenIds.current();
+        _mint(recipient, newItemId);
+        _setTokenURI(newItemId, tokenURI);
 
         // Create an ERC6551 account for the new NFT
-        uint256 salt = newTokenId; // Using tokenId as salt for simplicity
+        uint256 salt = newItemId; // TODO:Using tokenId as salt for simplicity
         address newAccount = registry.createAccount(
             erc6551AccountImplementation,
             block.chainid,
             address(this),
-            newTokenId,
+            newItemId,
             salt,
             "" // No initialization data for the new account in this example
         );
 
         // Optionally, you can store the newAccount address in a mapping or emit an event
-        emit AccountCreated(newTokenId);
-    }
-
-    function getTokenId() internal returns (uint256) {
-        tokenId += 1;
-        return tokenId;
+        emit AccountCreated(newItemId, newAccount);
     }
 }
-
-    

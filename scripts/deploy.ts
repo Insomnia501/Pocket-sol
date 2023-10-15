@@ -34,35 +34,35 @@ async function main() {
 
     let [addr] = await ethers.getSigners();
 
-    const name_1 = "name";
-    const symbol = "symbol"
+    const name_1 = "pocket";
+    const symbol = "ERC721-token"
 
-    // IERC6551Registry deploy
-    const ERC6551Registry = await ethers.getContractFactory("ERC6551Registry");
-    const erc6551Registry = await ERC6551Registry.deploy();
-    await erc6551Registry.waitForDeployment();
-    const erc6551RegistryAddress = await erc6551Registry.getAddress();
-    console.log("Registry deployed:", erc6551RegistryAddress);
+    // ERC6551Registry deploy
+    //const ERC6551Registry = await ethers.getContractFactory("ERC6551Registry");
+    //const erc6551Registry = await ERC6551Registry.deploy();
+    //await erc6551Registry.waitForDeployment();
+    //const erc6551RegistryAddress = await erc6551Registry.getAddress();
+    //console.log("Registry deployed:", erc6551RegistryAddress);
 
-    // IERC6551Registry deploy
-    const ERC6551Account = await ethers.getContractFactory("ERC6551Account");
-    const erc6551Account = await ERC6551Account.deploy();
-    await erc6551Account.waitForDeployment();
-    const erc6551AccountAddress = await erc6551Account.getAddress();
-    console.log("Account deployed:", erc6551AccountAddress);
+    // Pocket account deploy
+    const PocketAccount = await ethers.getContractFactory("VIPCardAccount");
+    const pocketAccount = await PocketAccount.deploy();
+    await pocketAccount.waitForDeployment();
+    const pocketAccountAddress = await pocketAccount.getAddress();
+    console.log("pocket account deployed:", pocketAccountAddress);
 
-    // erc6551AccountImplementation = ethers.Wallet.createRandom().address; // Just a random address for testing
-    const ERC6551NFT = await ethers.getContractFactory("ERC6551NFT");
-    const erc6551NFT = await ERC6551NFT.deploy(name_1, symbol, erc6551RegistryAddress, erc6551AccountAddress);
-    await erc6551NFT.waitForDeployment();
-    const erc6551NFTAddress = await erc6551NFT.getAddress();
-    console.log("NFT deployed");
+    // Pocket deploy
+    //const Pocket = await ethers.getContractFactory("Pocket");
+    //const pocket = await Pocket.deploy(name_1, symbol, erc6551RegistryAddress, pocketAccountAddress);
+    //await pocket.waitForDeployment();
+    //const pocketAddress = await pocket.getAddress();
+    //console.log("pocket deployed:", pocketAddress);
 
     // verify the contracts
-    await hre.run("verify:verify", {
-        address: erc6551NFTAddress,
-        constructorArguments: [name_1, symbol, erc6551RegistryAddress, erc6551AccountAddress],
-    });
+    //await hre.run("verify:verify", {
+    //    address: pocketAddress,
+    //    constructorArguments: [name_1, symbol, erc6551RegistryAddress, pocketAccountAddress],
+    //});
 }
 
 // We recommend this pattern to be able to use async/await everywhere
